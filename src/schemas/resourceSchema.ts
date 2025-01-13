@@ -25,7 +25,24 @@ export const resourceSchema = z.object({
     .string()
     .min(1, "Descrição do resource é obrigatória")
     .max(100, "Digite no máximo 100 caracteres"),
-  keys: z.array(resourceKeySchema).min(1, "Digite no mínimo 1 resource"),
+  keys: z
+    .array(resourceKeySchema)
+    .min(1, "Digite no mínimo 1 resource")
+    .superRefine((keys, ctx) => {
+      const keyNames = new Set()
+
+      keys.forEach((key, index) => {
+        if (keyNames.has(key.name)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Já existe uma chave(resource key) com o mesmo nome",
+            path: [index, "name"],
+          })
+        } else {
+          keyNames.add(key.name)
+        }
+      })
+    }),
 })
 
 export type Resource = z.infer<typeof resourceSchema>
