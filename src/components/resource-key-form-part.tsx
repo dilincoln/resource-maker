@@ -207,7 +207,7 @@ export function ResourceKeyFormPart({
         </CardHeader>
         <CardContent className="p-0">
           <CollapsibleContent className="p-4 pt-0">
-            <div className="space-y-4 p-4 border rounded-md">
+            <div className="space-y-4">
               <div>
                 <Label htmlFor={nameFormControlName}>
                   Nome da Chave (Resource key){" "}
