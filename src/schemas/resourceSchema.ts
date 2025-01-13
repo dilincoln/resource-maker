@@ -10,14 +10,8 @@ export const resourceKeySchema = z.object({
     .string()
     .min(1, "Descrição da chave é obrigatória")
     .max(100, "Digite no máximo 100 caracteres"),
-  ptBR: z
-    .string()
-    .min(1, "Tradução em português é obrigatória")
-    .max(100, "Digite no máximo 100 caracteres"),
-  es: z
-    .string()
-    .min(1, "Tradução em espanhol é obrigatória")
-    .max(100, "Digite no máximo 100 caracteres"),
+  ptBR: z.string().min(1, "Tradução em português é obrigatória"),
+  es: z.string().min(1, "Tradução em espanhol é obrigatória"),
 })
 
 export const resourceSchema = z.object({
