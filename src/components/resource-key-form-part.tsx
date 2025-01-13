@@ -60,10 +60,12 @@ export function ResourceKeyFormPart({
 
   useEffect(() => {
     const { unsubscribe } = watch((value) => {
-      const resourceGroupKey = capitalize(
-        (value as { name: string }).name
+      const resourceGroupKey = (value as { name: string }).name
+        .replace(/ /g, "")
+        .trim()
+      const resourceKey = capitalize(
+        `${value.keys?.[index]?.name?.replace(/ /g, "")}`
       ).trim()
-      const resourceKey = capitalize(`${value.keys?.[index]?.name}`).trim()
 
       if (resourceGroupKey && resourceKey) {
         setResourceKeyPreview(
