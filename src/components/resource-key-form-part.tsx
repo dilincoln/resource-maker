@@ -11,6 +11,8 @@ import { Button } from "./ui/button"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import {
+  Check,
+  Copy,
   EyeIcon,
   EyeOffIcon,
   LanguagesIcon,
@@ -26,6 +28,7 @@ import {
 } from "./ui/tooltip"
 import { translate } from "@/server-actions/translate"
 import { toast } from "sonner"
+import { capitalize } from "@/util/capitalize"
 
 interface ResourceKeyFormPartProps {
   index: number
@@ -38,6 +41,8 @@ export function ResourceKeyFormPart({
 }: ResourceKeyFormPartProps) {
   const [isCollapsed, setIsCollapsed] = useState(true)
   const [canTranslate, setCanTranslate] = useState("")
+  const [isCopied, setIsCopied] = useState(false)
+  const [resourceKeyPreview, setResourceKeyPreview] = useState("")
   const [isLoadingTranslation, setIsLoadingTranslation] = useState(false)
   const { formState, watch, register, setValue } = useFormContext<{
     keys: ResourceKey[]
@@ -55,6 +60,19 @@ export function ResourceKeyFormPart({
 
   useEffect(() => {
     const { unsubscribe } = watch((value) => {
+      const resourceGroupKey = capitalize(
+        (value as { name: string }).name
+      ).trim()
+      const resourceKey = capitalize(`${value.keys?.[index]?.name}`).trim()
+
+      if (resourceGroupKey && resourceKey) {
+        setResourceKeyPreview(
+          `${resourceGroupKey}.${resourceGroupKey}${resourceKey}`
+        )
+      } else {
+        setResourceKeyPreview("")
+      }
+
       setCanTranslate(`${value.keys?.[index]?.ptBR}`)
     })
 
@@ -103,6 +121,16 @@ export function ResourceKeyFormPart({
     }
   }
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(resourceKeyPreview)
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 2000) // Reset after 2 seconds
+    } catch (err) {
+      console.error("Failed to copy text: ", err)
+    }
+  }
+
   return (
     <Collapsible open={isCollapsed} onOpenChange={setIsCollapsed}>
       <Card
@@ -114,12 +142,35 @@ export function ResourceKeyFormPart({
         <CardHeader>
           <CardTitle>
             <div className="flex items-center justify-between gap-2">
-              <Label
-                className="text-lg font-semibold"
-                htmlFor={`keys.${index}.name`}
-              >
-                Resource #{index + 1}
-              </Label>
+              <div className="flex gap-2 items-center">
+                <Label
+                  className="text-lg font-semibold"
+                  htmlFor={`keys.${index}.name`}
+                >
+                  Resource #{index + 1}
+                </Label>
+
+                {resourceKeyPreview && (
+                  <Button
+                    size="sm"
+                    type="button"
+                    onClick={handleCopy}
+                    variant="outline"
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check className="mr-2 size-4" />
+                        Copiado!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="mr-2 size-4" />
+                        {resourceKeyPreview}
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
 
               <div className="flex items-center gap-2">
                 <CollapsibleTrigger asChild>
